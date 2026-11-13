@@ -1,0 +1,23 @@
+# Opsflow triage rules. Keywords match whole words or phrases, case-insensitively, in the title and description.
+# Priorities are checked top to bottom; the first level with a match wins.
+priorities:
+  - level: P1
+    reason: outage or urgent wording
+    keywords: [down, outage, urgent, critical, "not responding", unreachable, sev1, "data loss", breach, "production down", "all users"]
+  - level: P2
+    reason: errors or degraded service
+    keywords: [error, errors, issue, exception, failing, failed, fails, broken, slow, timeout, "timed out", bug, crash, crashed, degraded, "500"]
+default-priority: P3
+default-priority-reason: no outage or error wording, treated as a routine request
+
+# The team with the most matching keywords owns the ticket; on a tie, the one listed first.
+teams:
+  - team: db-team
+    keywords: [db, database, postgres, postgresql, mysql, sql, query, queries, deadlock, replica, replication, migration, index]
+  - team: network-team
+    keywords: [network, dns, vpn, latency, firewall, packet, "load balancer", ssl, tls, certificate, proxy, wifi]
+  - team: auth-team
+    keywords: [login, "log in", auth, authentication, password, sso, oauth, 2fa, mfa, token, permission, permissions, access, locked]
+  - team: devops-team
+    keywords: [deploy, deployment, ci, cd, pipeline, build, kubernetes, k8s, docker, release, rollback, helm]
+default-team: general-support

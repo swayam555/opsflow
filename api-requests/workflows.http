@@ -1,0 +1,37 @@
+@base = http://localhost:8090
+@token = opsflow-dev-token
+
+### Templates
+GET {{base}}/api/workflows
+Authorization: Bearer {{token}}
+
+### Triage rules
+GET {{base}}/api/triage/rules
+Authorization: Bearer {{token}}
+
+### What would happen, without saving anything
+POST {{base}}/api/triage/preview
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"title": "Login errors for SSO users", "description": "auth callback fails"}
+
+### Run a workflow by hand (empty body = pick automatically)
+POST {{base}}/api/tickets/OPS-1001/runs
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"workflow": "db-incident"}
+
+### Runs of a ticket
+GET {{base}}/api/tickets/OPS-1001/runs
+Authorization: Bearer {{token}}
+
+### All runs
+GET {{base}}/api/runs
+Authorization: Bearer {{token}}
+
+### Retry a failed run from the failed step
+@run = paste-a-run-id
+POST {{base}}/api/runs/{{run}}/retry
+Authorization: Bearer {{token}}

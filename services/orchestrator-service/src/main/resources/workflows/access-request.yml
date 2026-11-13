@@ -1,0 +1,15 @@
+id: access-request
+name: Access request
+description: Routine access and login requests for the auth team. No deployment.
+order: 50
+match:
+  teams: [auth-team]
+  priorities: [P3]
+steps:
+  - type: notify
+    message: "Access request ${key}: ${title}"
+  - type: jira
+    summary: "Access: ${title}"
+    message: "Check approval before granting."
+  - type: complete
+    message: "Access request queued for ${team}"

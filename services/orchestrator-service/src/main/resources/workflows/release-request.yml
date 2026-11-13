@@ -1,0 +1,25 @@
+id: release-request
+name: Release request
+description: For devops tickets that are not outages. Deploy to staging, then production, and track it.
+order: 40
+match:
+  teams: [devops-team]
+  priorities: [P2, P3]
+steps:
+  - type: notify
+    message: "Release requested in ${key}: ${title}"
+  - type: deployment
+    label: Deploy to staging
+    environment: staging
+    service: core-api
+    reason: "${key}: ${title}"
+  - type: deployment
+    label: Deploy to production
+    environment: production
+    service: core-api
+    reason: "${key}: ${title}"
+  - type: jira
+    summary: "Release ${key}: ${title}"
+    message: "Deployed to staging and production."
+  - type: complete
+    message: "Release workflow finished for ${key}"

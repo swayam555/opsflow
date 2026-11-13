@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Opsflow</title>
+  <meta name="description" content="IT tickets in, triage and workflow automation out.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <div id="signin" class="signin hidden">
+    <form id="signin-form" class="signin-card" novalidate>
+      <div class="brand big"><span class="logo" aria-hidden="true"></span>Opsflow</div>
+      <p class="muted">Tickets in, triage and automation out. Sign in with the API token from your <code>.env</code>.</p>
+      <p class="alert hidden" id="signin-error" role="alert"></p>
+      <label class="field"><span>API token</span><input id="token" name="token" type="password" autocomplete="current-password" required></label>
+      <label class="field"><span>Your name <em>(shown in the audit trail)</em></span><input id="actor" name="actor" maxlength="60" autocomplete="name" placeholder="e.g. Asha from the NOC"></label>
+      <button class="btn primary wide" id="signin-go" type="submit">Sign in</button>
+      <p class="hint">Local default token: <code>opsflow-dev-token</code></p>
+    </form>
+  </div>
+
+  <div id="app" class="hidden">
+    <header class="top">
+      <a class="brand" href="#/tickets"><span class="logo" aria-hidden="true"></span>Opsflow</a>
+      <button class="btn ghost menu" id="menu" aria-expanded="false" aria-controls="nav">Menu</button>
+      <nav id="nav" class="nav">
+        <a href="#/tickets" data-nav="tickets">Tickets</a>
+        <a href="#/dashboard" data-nav="dashboard">Dashboard</a>
+        <a href="#/workflows" data-nav="workflows">Workflows</a>
+        <a href="#/activity/notifications" data-nav="activity">Activity</a>
+        <a href="#/system" data-nav="system">System</a>
+      </nav>
+      <div class="who"><span id="who"></span><button class="btn ghost sm" id="signout">Sign out</button></div>
+    </header>
+    <main id="main" tabindex="-1"></main>
+  </div>
+
+  <div id="modal-root"></div>
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>

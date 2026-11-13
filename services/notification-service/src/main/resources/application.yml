@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: notification-service
+  datasource:
+    url: ${OPSFLOW_DB_URL:jdbc:h2:mem:notification;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;DB_CLOSE_DELAY=-1}
+    username: ${OPSFLOW_DB_USER:sa}
+    password: ${OPSFLOW_DB_PASSWORD:}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  threads:
+    virtual:
+      enabled: true
+server:
+  port: ${PORT:8083}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+opsflow:
+  internal:
+    token: ${OPSFLOW_INTERNAL_TOKEN:opsflow-internal-dev}
+  slack:
+    # An incoming-webhook URL (https://hooks.slack.com/services/...). Empty: notifications are recorded, not posted.
+    webhook-url: ${OPSFLOW_SLACK_WEBHOOK_URL:}

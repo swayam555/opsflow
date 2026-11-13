@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: tracker-service
+  datasource:
+    url: ${OPSFLOW_DB_URL:jdbc:h2:mem:tracker;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;DB_CLOSE_DELAY=-1}
+    username: ${OPSFLOW_DB_USER:sa}
+    password: ${OPSFLOW_DB_PASSWORD:}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  threads:
+    virtual:
+      enabled: true
+server:
+  port: ${PORT:8085}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+opsflow:
+  internal:
+    token: ${OPSFLOW_INTERNAL_TOKEN:opsflow-internal-dev}
+  tracker:
+    project-key: ${OPSFLOW_TRACKER_PROJECT:INC}
+  jira:
+    # All four set: issues are also created in Jira Cloud. Otherwise the local tracker is the source of truth.
+    base-url: ${OPSFLOW_JIRA_BASE_URL:}
+    email: ${OPSFLOW_JIRA_EMAIL:}
+    api-token: ${OPSFLOW_JIRA_API_TOKEN:}
+    project: ${OPSFLOW_JIRA_PROJECT:}
+    issue-type: ${OPSFLOW_JIRA_ISSUE_TYPE:Task}

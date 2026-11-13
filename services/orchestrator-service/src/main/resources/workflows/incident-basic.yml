@@ -1,0 +1,20 @@
+# The default workflow: used when no other template matches the ticket.
+id: incident-basic
+name: Basic incident
+description: Tell the owning team, open a tracker issue, run a staging deployment for diagnostics, and close out.
+order: 1000
+match: {}            # matches every ticket
+steps:
+  - type: notify
+    message: "New ${priority} ticket ${key} triaged to ${team}: ${title}"
+  - type: jira
+    summary: "[${priority}] ${title}"
+    message: "Opened automatically for ${key}."
+  - type: deployment
+    environment: staging
+    service: diagnostics
+    reason: "Diagnostics build for ${key}"
+  - type: log
+    message: "Internal diagnostics recorded for ${key}"
+  - type: complete
+    message: "Workflow finished for ${key}"

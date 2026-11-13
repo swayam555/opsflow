@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: orchestrator-service
+  datasource:
+    url: ${OPSFLOW_DB_URL:jdbc:h2:mem:orchestrator;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;DB_CLOSE_DELAY=-1}
+    username: ${OPSFLOW_DB_USER:sa}
+    password: ${OPSFLOW_DB_PASSWORD:}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  threads:
+    virtual:
+      enabled: true
+server:
+  port: ${PORT:8082}
+opsflow:
+  internal:
+    token: ${OPSFLOW_INTERNAL_TOKEN:opsflow-internal-dev}
+  services:
+    ticket-url: ${OPSFLOW_TICKET_URL:http://localhost:8080}
+    notification-url: ${OPSFLOW_NOTIFICATION_URL:http://localhost:8083}
+    deployment-url: ${OPSFLOW_DEPLOYMENT_URL:http://localhost:8084}
+    tracker-url: ${OPSFLOW_TRACKER_URL:http://localhost:8085}
+  orchestrator:
+    # Extra or replacement templates: every *.yml in this folder (same id replaces a built-in one)
+    workflow-dir: ${OPSFLOW_WORKFLOW_DIR:}
+    default-workflow: ${OPSFLOW_DEFAULT_WORKFLOW:incident-basic}
+    retry-base-millis: ${OPSFLOW_RETRY_BASE_MILLIS:1000}
+    deploy-poll-millis: 500
+    deploy-timeout-seconds: ${OPSFLOW_DEPLOY_TIMEOUT:120}
+    report-sweep-millis: 5000
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

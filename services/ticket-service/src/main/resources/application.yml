@@ -1,0 +1,47 @@
+spring:
+  # Reproducible builds stamp every file 1980-02-01, so Last-Modified never changes and
+  # browsers would keep a stale app.js after an upgrade. Send no Last-Modified instead.
+  web:
+    resources:
+      cache:
+        use-last-modified: false
+  application:
+    name: ticket-service
+  datasource:
+    url: ${OPSFLOW_DB_URL:jdbc:h2:mem:ticket;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;DB_CLOSE_DELAY=-1}
+    username: ${OPSFLOW_DB_USER:sa}
+    password: ${OPSFLOW_DB_PASSWORD:}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  threads:
+    virtual:
+      enabled: true
+server:
+  port: ${PORT:8080}
+opsflow:
+  internal:
+    token: ${OPSFLOW_INTERNAL_TOKEN:opsflow-internal-dev}
+    # Only the callback from the orchestrator is internal here; /api uses the API tokens below.
+    paths: /internal/**
+  api:
+    # Full access (create, change, run). Required.
+    token: ${OPSFLOW_API_TOKEN:opsflow-dev-token}
+    # Optional read-only token, e.g. for a wallboard.
+    viewer-token: ${OPSFLOW_VIEWER_TOKEN:}
+  timezone: ${OPSFLOW_TIMEZONE:Asia/Kolkata}
+  services:
+    triage-url: ${OPSFLOW_TRIAGE_URL:http://localhost:8081}
+    orchestrator-url: ${OPSFLOW_ORCHESTRATOR_URL:http://localhost:8082}
+    notification-url: ${OPSFLOW_NOTIFICATION_URL:http://localhost:8083}
+    deployment-url: ${OPSFLOW_DEPLOYMENT_URL:http://localhost:8084}
+    tracker-url: ${OPSFLOW_TRACKER_URL:http://localhost:8085}
+  jobs:
+    sweep-millis: 2000
+    base-backoff-millis: ${OPSFLOW_JOB_BACKOFF_MILLIS:2000}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: triage-service
+  threads:
+    virtual:
+      enabled: true
+server:
+  port: ${PORT:8081}
+opsflow:
+  internal:
+    token: ${OPSFLOW_INTERNAL_TOKEN:opsflow-internal-dev}
+  triage:
+    # Path to your own rules file; empty uses the built-in triage-rules.yml
+    rules-file: ${OPSFLOW_TRIAGE_RULES:}
+  llm:
+    api-key: ${OPSFLOW_LLM_API_KEY:}
+    base-url: ${OPSFLOW_LLM_BASE_URL:https://api.groq.com/openai/v1}
+    model: ${OPSFLOW_LLM_MODEL:llama-3.1-8b-instant}
+    timeout-seconds: ${OPSFLOW_LLM_TIMEOUT:12}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

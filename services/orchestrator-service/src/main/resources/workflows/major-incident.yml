@@ -1,0 +1,22 @@
+id: major-incident
+name: Major incident (P1)
+description: Wake the owning team and the incident bridge at once, open a P1 issue and record the escalation.
+order: 10
+match:
+  priorities: [P1]
+steps:
+  - type: notify
+    message: "P1 ${key}: ${title}. You own this one; join the bridge."
+    retries: 4
+  - type: notify
+    channel: "#incident-bridge"
+    message: "Major incident ${key} declared for ${team}: ${title}"
+    retries: 4
+  - type: jira
+    summary: "[P1] ${title}"
+    message: "Major incident. Owner: ${team}."
+    retries: 4
+  - type: log
+    message: "Escalation policy started for ${team}; status page draft prepared"
+  - type: complete
+    message: "Major incident workflow finished for ${key}"

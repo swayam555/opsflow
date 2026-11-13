@@ -1,0 +1,117 @@
+name: opsflow
+
+x-service: &service
+  restart: unless-stopped
+  mem_limit: 320m
+  networks: [opsflow]
+  depends_on:
+    postgres: { condition: service_healthy }
+
+x-env: &env
+  OPSFLOW_INTERNAL_TOKEN: ${OPSFLOW_INTERNAL_TOKEN:-opsflow-internal-change-me}
+  OPSFLOW_DB_PASSWORD: ${OPSFLOW_DB_PASSWORD:-opsflow-db-dev}
+  OPSFLOW_TICKET_URL: http://ticket-service:8080
+  OPSFLOW_TRIAGE_URL: http://triage-service:8081
+  OPSFLOW_ORCHESTRATOR_URL: http://orchestrator-service:8082
+  OPSFLOW_NOTIFICATION_URL: http://notification-service:8083
+  OPSFLOW_DEPLOYMENT_URL: http://deployment-service:8084
+  OPSFLOW_TRACKER_URL: http://tracker-service:8085
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    mem_limit: 256m
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${OPSFLOW_DB_ROOT_PASSWORD:-opsflow-root-dev}
+      OPSFLOW_DB_PASSWORD: ${OPSFLOW_DB_PASSWORD:-opsflow-db-dev}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./infra/postgres-init.sh:/docker-entrypoint-initdb.d/10-databases.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres && psql -U postgres -tAc \"select 1 from pg_database where datname='tracker'\" | grep -q 1"]
+      interval: 5s
+      timeout: 4s
+      retries: 20
+    networks: [opsflow]
+
+  ticket-service:
+    <<: *service
+    build: { context: ., target: ticket-service }
+    image: opsflow/ticket-service:1.0.0
+    ports: ["${OPSFLOW_PORT:-8090}:8080"]
+    environment:
+      <<: *env
+      OPSFLOW_DB_URL: jdbc:postgresql://postgres:5432/tickets
+      OPSFLOW_DB_USER: tickets_svc
+      OPSFLOW_API_TOKEN: ${OPSFLOW_API_TOKEN:-opsflow-dev-token}
+      OPSFLOW_VIEWER_TOKEN: ${OPSFLOW_VIEWER_TOKEN:-}
+      OPSFLOW_TIMEZONE: ${OPSFLOW_TIMEZONE:-Asia/Kolkata}
+
+  triage-service:
+    <<: *service
+    depends_on: {}
+    build: { context: ., target: triage-service }
+    image: opsflow/triage-service:1.0.0
+    mem_limit: 256m
+    environment:
+      <<: *env
+      OPSFLOW_LLM_API_KEY: ${OPSFLOW_LLM_API_KEY:-}
+      OPSFLOW_LLM_BASE_URL: ${OPSFLOW_LLM_BASE_URL:-https://api.groq.com/openai/v1}
+      OPSFLOW_LLM_MODEL: ${OPSFLOW_LLM_MODEL:-llama-3.1-8b-instant}
+
+  orchestrator-service:
+    <<: *service
+    build: { context: ., target: orchestrator-service }
+    image: opsflow/orchestrator-service:1.0.0
+    environment:
+      <<: *env
+      OPSFLOW_DB_URL: jdbc:postgresql://postgres:5432/orchestrator
+      OPSFLOW_DB_USER: orchestrator_svc
+      OPSFLOW_WORKFLOW_DIR: /workflows
+    volumes:
+      - ./workflows:/workflows:ro
+
+  notification-service:
+    <<: *service
+    build: { context: ., target: notification-service }
+    image: opsflow/notification-service:1.0.0
+    mem_limit: 288m
+    environment:
+      <<: *env
+      OPSFLOW_DB_URL: jdbc:postgresql://postgres:5432/notifications
+      OPSFLOW_DB_USER: notifications_svc
+      OPSFLOW_SLACK_WEBHOOK_URL: ${OPSFLOW_SLACK_WEBHOOK_URL:-}
+
+  deployment-service:
+    <<: *service
+    build: { context: ., target: deployment-service }
+    image: opsflow/deployment-service:1.0.0
+    mem_limit: 288m
+    environment:
+      <<: *env
+      OPSFLOW_DB_URL: jdbc:postgresql://postgres:5432/deployments
+      OPSFLOW_DB_USER: deployments_svc
+      OPSFLOW_DEPLOY_ENVIRONMENTS: ${OPSFLOW_DEPLOY_ENVIRONMENTS:-dev,staging,production}
+
+  tracker-service:
+    <<: *service
+    build: { context: ., target: tracker-service }
+    image: opsflow/tracker-service:1.0.0
+    mem_limit: 288m
+    environment:
+      <<: *env
+      OPSFLOW_DB_URL: jdbc:postgresql://postgres:5432/tracker
+      OPSFLOW_DB_USER: tracker_svc
+      OPSFLOW_TRACKER_PROJECT: ${OPSFLOW_TRACKER_PROJECT:-INC}
+      OPSFLOW_JIRA_BASE_URL: ${OPSFLOW_JIRA_BASE_URL:-}
+      OPSFLOW_JIRA_EMAIL: ${OPSFLOW_JIRA_EMAIL:-}
+      OPSFLOW_JIRA_API_TOKEN: ${OPSFLOW_JIRA_API_TOKEN:-}
+      OPSFLOW_JIRA_PROJECT: ${OPSFLOW_JIRA_PROJECT:-}
+
+networks:
+  opsflow: {}
+
+volumes:
+  pgdata: {}

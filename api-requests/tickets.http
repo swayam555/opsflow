@@ -1,0 +1,75 @@
+@base = http://localhost:8090
+@token = opsflow-dev-token
+
+### Who am I
+GET {{base}}/api/session
+Authorization: Bearer {{token}}
+
+### Create a ticket (triage and a workflow follow)
+POST {{base}}/api/tickets
+Authorization: Bearer {{token}}
+X-Actor: Asha (NOC)
+Content-Type: application/json
+
+{"title": "Payments API down for all users", "description": "502 from the gateway since 10:40", "reporter": "noc"}
+
+### Create a ticket with a fixed priority and workflow
+POST {{base}}/api/tickets
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"title": "Release search service 5.2", "priority": "P3", "workflow": "release-request"}
+
+### Search tickets
+GET {{base}}/api/tickets?q=payments&status=ACTIONED&priority=P1&page=0&size=20
+Authorization: Bearer {{token}}
+
+### One ticket with its events
+GET {{base}}/api/tickets/OPS-1001
+Authorization: Bearer {{token}}
+
+### Change priority and owner
+PATCH {{base}}/api/tickets/OPS-1001
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"priority": "P2", "ownerTeam": "network-team"}
+
+### Add a note
+POST {{base}}/api/tickets/OPS-1001/notes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"text": "Paged the on-call DBA"}
+
+### Triage again (and start a new workflow)
+POST {{base}}/api/tickets/OPS-1001/retriage
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"rerun": true}
+
+### Resolve (closes its tracker issues)
+PATCH {{base}}/api/tickets/OPS-1001
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"status": "RESOLVED"}
+
+### Reopen
+PATCH {{base}}/api/tickets/OPS-1001
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"status": "REOPENED"}
+
+### Latest audit events
+GET {{base}}/api/events/recent
+Authorization: Bearer {{token}}
+
+### First-version endpoint, still supported
+POST {{base}}/tickets
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"title": "DB connection errors", "description": "db pool exhausted, errors on checkout"}

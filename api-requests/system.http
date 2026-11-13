@@ -1,0 +1,44 @@
+@base = http://localhost:8090
+@token = opsflow-dev-token
+
+### Dashboard numbers
+GET {{base}}/api/stats
+Authorization: Bearer {{token}}
+
+### Health of every service, waiting jobs, integrations, freezes
+GET {{base}}/api/system
+Authorization: Bearer {{token}}
+
+### Retry waiting jobs now
+POST {{base}}/api/system/jobs/retry
+Authorization: Bearer {{token}}
+
+### Make the next deployment fail its health check
+POST {{base}}/api/system/chaos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"failNext": 1}
+
+### Freeze production
+PUT {{base}}/api/system/freezes/production
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"reason": "Festival change freeze"}
+
+### Unfreeze production
+DELETE {{base}}/api/system/freezes/production
+Authorization: Bearer {{token}}
+
+### Activity
+GET {{base}}/api/activity/notifications
+Authorization: Bearer {{token}}
+
+###
+GET {{base}}/api/activity/deployments
+Authorization: Bearer {{token}}
+
+###
+GET {{base}}/api/activity/issues
+Authorization: Bearer {{token}}

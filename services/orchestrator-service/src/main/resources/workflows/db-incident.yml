@@ -1,0 +1,19 @@
+id: db-incident
+name: Database problem
+description: Errors or slowness on a database. The DBA channel is told, an issue opened, and a snapshot noted.
+order: 30
+match:
+  teams: [db-team]
+  priorities: [P2]
+steps:
+  - type: notify
+    channel: "#dba"
+    message: "${key} needs a DBA: ${title}"
+  - type: jira
+    summary: "[DB] ${title}"
+    message: "Attach the slow query log and EXPLAIN output."
+  - type: log
+    message: "Requested a snapshot of the affected database before any fix"
+    continueOnError: true
+  - type: complete
+    message: "Database workflow finished for ${key}"
